@@ -1,23 +1,34 @@
+import Link from "next/link";
+import { RichText } from "prismic-reactjs";
+import React from "react";
+import Footer from "../components/Footer";
 import Nav from "../components/nav";
 import { Client } from "../prismic-configuration";
-import { RichText } from "prismic-reactjs";
 import Prismic from "prismic-javascript";
-import LandingSection from "../components/LandingSection";
-import AboutSection from "../components/AboutSection";
-import ProjectsSection from "../components/ProjectsSection";
-import Footer from "../components/Footer";
-import MyTopTweets from "../components/MyTopTweets";
+import moment from "moment";
 import Head from "next/head";
 
-export default function IndexPage(props) {
-  const metaData = props.metaData.results[0].data;
+function formatDate(date) {
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  const today = new Date(date);
+
+  return today.toLocaleDateString("en-US", options);
+}
+
+function giveTime(DateStr) {
+  let entryDate = new Date(DateStr);
+  var momentObj = moment(entryDate);
+  return momentObj.format("LLLL");
+}
+
+const index = ({ journals, metaData }) => {
+  metaData = metaData.results[0].data;
 
   const og = {
-    title: RichText.asText(metaData.title),
+    title: RichText.asText(metaData["journal-title"]),
     description: RichText.asText(metaData.description),
     imageURL: metaData.image.url,
   };
-
   return (
     <>
       <Head>
@@ -68,38 +79,46 @@ export default function IndexPage(props) {
       </Head>
       <div>
         <Nav />
-        <div className="w-full max-w-5xl mx-auto px-8">
-          <LandingSection data={props.landingData.results[0].data} />
-          <AboutSection data={props.aboutData.results[0].data} />
-          <ProjectsSection
-            featuredProjects={props.featuredProjects.results[0].data}
-            miniProjects={props.miniProjects.results[0].data}
-          />
-          <MyTopTweets data={props.tweetsData.results[0].data} />
+        <div className="w-full max-w-4xl mx-auto px-8">
+          {" "}
+          <h1 className="blog-title text-6xl mb-10 md:text-7xl text-left">
+            Weight of<span className="amp"> </span>
+            <span className="primary-color-font"> Thoughts</span>
+          </h1>
+          <h1 className=" text-2xl mb-10 text-left font-serif italic">
+            Journal with random thoughts and ideas that float around in my head.
+          </h1>
+          <div className="grid grid-cols-1 gap-y-10">
+            {journals.results.map((journal, index) => (
+              <div className=" writing-row p-0" key={journal.uid}>
+                <div className="writing-date">
+                  {giveTime(journal.data.time)}
+                </div>
+
+                <h1 className="writing-title font-serif italic">
+                  {RichText.render(journal.data["title"])}
+                </h1>
+                <h1 className="writing-title font-serif italic">
+                  {RichText.render(journal.data["entry"])}
+                </h1>
+              </div>
+            ))}
+          </div>
         </div>
         <Footer />
       </div>
     </>
   );
-}
+};
 
-// this function is called everytime a request/refresh is made
+export default index;
 
 export async function getStaticProps() {
-  const landingData = await Client().query(
-    Prismic.Predicates.at("document.type", "landing-page")
-  );
-  const aboutData = await Client().query(
-    Prismic.Predicates.at("document.type", "about-section")
-  );
-  const featuredProjects = await Client().query(
-    Prismic.Predicates.at("document.type", "featured-projects")
-  );
-  const miniProjects = await Client().query(
-    Prismic.Predicates.at("document.type", "mini-projects")
-  );
-  const tweetsData = await Client().query(
-    Prismic.Predicates.at("document.type", "tweets-section")
+  const journals = await Client().query(
+    Prismic.Predicates.at("document.type", "journal"),
+    {
+      pageSize: 200,
+    }
   );
 
   const metaData = await Client().query(
@@ -108,11 +127,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      landingData,
-      aboutData,
-      featuredProjects,
-      miniProjects,
-      tweetsData,
+      journals,
       metaData,
     },
   };

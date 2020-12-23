@@ -1,31 +1,57 @@
-import Link from 'next/link'
-
-const links = [
-  { href: 'https://github.com/vercel/next.js', label: 'GitHub' },
-  { href: 'https://nextjs.org/docs', label: 'Docs' },
-]
-
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { FiSun, FiMoon } from "react-icons/fi";
 export default function Nav() {
+  const onLoadTheme =
+    typeof localStorage !== "undefined" && localStorage.getItem("BLOG_THEME");
+  const [theme, setTheme] = useState(onLoadTheme);
+  const [mounted, setMounted] = useState(false);
+  const switchTheme = () => {
+    const setTo = theme === "dark" ? "light" : "dark";
+
+    setTheme(setTo);
+  };
+
+  useEffect(() => {
+    if (onLoadTheme) return;
+
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setTheme("dark");
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+
+    localStorage.setItem("BLOG_THEME", theme);
+
+    setMounted(true);
+  }, [theme]);
+
   return (
-    <nav>
-      <ul className="flex items-center justify-between p-8">
+    <nav className="z-10 sticky top-0 bg-bg-color bg-opacity-100 p-8  ">
+      <ul className="flex items-center justify-between ">
         <li>
           <Link href="/">
-            <a className="text-blue-500 no-underline text-accent-1 dark:text-blue-300">
-              Home
-            </a>
+            <a className=" nav-link">Home</a>
           </Link>
         </li>
         <ul className="flex items-center justify-between space-x-4">
-          {links.map(({ href, label }) => (
-            <li key={`${href}${label}`}>
-              <a href={href} className="no-underline btn-blue">
-                {label}
-              </a>
-            </li>
-          ))}
+          <Link href="/blog">
+            <a className=" nav-link">Blog</a>
+          </Link>
+          <Link href="/journal">
+            <a className=" nav-link">Journal</a>
+          </Link>
+          <button
+            className="theme-switch-button"
+            style={{ outline: "none" }}
+            onClick={() => switchTheme()}
+          >
+            {theme === "dark" ? <FiSun /> : <FiMoon />}
+          </button>
         </ul>
       </ul>
     </nav>
-  )
+  );
 }

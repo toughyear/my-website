@@ -1,23 +1,27 @@
-import Nav from "../components/nav";
-import { Client } from "../prismic-configuration";
+import Link from "next/link";
 import { RichText } from "prismic-reactjs";
+import React from "react";
+import Footer from "../../components/Footer";
+import Nav from "../../components/nav";
+import { Client } from "../../prismic-configuration";
 import Prismic from "prismic-javascript";
-import LandingSection from "../components/LandingSection";
-import AboutSection from "../components/AboutSection";
-import ProjectsSection from "../components/ProjectsSection";
-import Footer from "../components/Footer";
-import MyTopTweets from "../components/MyTopTweets";
 import Head from "next/head";
 
-export default function IndexPage(props) {
-  const metaData = props.metaData.results[0].data;
+function formatDate(date) {
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  const today = new Date(date);
+
+  return today.toLocaleDateString("en-US", options);
+}
+
+const index = ({ blogs, metaData }) => {
+  metaData = metaData.results[0].data;
 
   const og = {
-    title: RichText.asText(metaData.title),
+    title: RichText.asText(metaData["blog-title"]),
     description: RichText.asText(metaData.description),
     imageURL: metaData.image.url,
   };
-
   return (
     <>
       <Head>
@@ -66,40 +70,56 @@ export default function IndexPage(props) {
 
         <title>{og.title}</title>
       </Head>
+
       <div>
         <Nav />
-        <div className="w-full max-w-5xl mx-auto px-8">
-          <LandingSection data={props.landingData.results[0].data} />
-          <AboutSection data={props.aboutData.results[0].data} />
-          <ProjectsSection
-            featuredProjects={props.featuredProjects.results[0].data}
-            miniProjects={props.miniProjects.results[0].data}
-          />
-          <MyTopTweets data={props.tweetsData.results[0].data} />
+        <div className="w-full max-w-7xl mx-auto px-8">
+          {" "}
+          <h1 className="blog-title text-6xl  md:text-7xl text-left">
+            Code, Numbers <span className="amp">&</span>{" "}
+            <span className="primary-color-font">Startups</span>
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 md:gap-x-5">
+            {blogs.results.map((blog, index) => (
+              <div className=" writing-row p-0" key={blog.uid}>
+                <div className="writing-date">
+                  {formatDate(blog.data.date)}
+                  {/* {blog.tags.length > 0
+                    ? `${formatDate(
+                        blog.data.date
+                      )} in: ${blog.tags.map((elem, index) =>
+                        index === 0
+                          ? elem.toUpperCase()
+                          : `| ${elem.toUpperCase()}`
+                      )}`
+                    : `${formatDate(blog.data.date)}`} */}
+                </div>
+                <Link href={`blog/${blog.uid}`}>
+                  <a>
+                    <span className="writing-title">
+                      {RichText.render(blog.data["title"])}
+                    </span>
+                  </a>
+                </Link>
+                <div className="writing-date"></div>
+              </div>
+            ))}
+          </div>
         </div>
         <Footer />
       </div>
     </>
   );
-}
+};
 
-// this function is called everytime a request/refresh is made
+export default index;
 
 export async function getStaticProps() {
-  const landingData = await Client().query(
-    Prismic.Predicates.at("document.type", "landing-page")
-  );
-  const aboutData = await Client().query(
-    Prismic.Predicates.at("document.type", "about-section")
-  );
-  const featuredProjects = await Client().query(
-    Prismic.Predicates.at("document.type", "featured-projects")
-  );
-  const miniProjects = await Client().query(
-    Prismic.Predicates.at("document.type", "mini-projects")
-  );
-  const tweetsData = await Client().query(
-    Prismic.Predicates.at("document.type", "tweets-section")
+  const blogs = await Client().query(
+    Prismic.Predicates.at("document.type", "blog"),
+    {
+      pageSize: 200,
+    }
   );
 
   const metaData = await Client().query(
@@ -108,11 +128,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      landingData,
-      aboutData,
-      featuredProjects,
-      miniProjects,
-      tweetsData,
+      blogs,
       metaData,
     },
   };
