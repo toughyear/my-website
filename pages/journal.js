@@ -95,12 +95,10 @@ const index = ({ journals, metaData }) => {
                   {giveTime(journal.data.time)}
                 </div>
 
-                <h1 className="writing-title font-serif italic">
+                <div className="writing-title font-serif italic">
                   {RichText.render(journal.data["title"])}
-                </h1>
-                <h1 className="writing-title font-serif italic">
-                  {RichText.render(journal.data["entry"])}
-                </h1>
+                </div>
+                <div className="">{RichText.render(journal.data["entry"])}</div>
               </div>
             ))}
           </div>
