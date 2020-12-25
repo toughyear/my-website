@@ -15,6 +15,7 @@ function formatDate(date) {
 }
 
 const index = ({ blogs, metaData }) => {
+  console.log(blogs);
   metaData = metaData.results[0].data;
 
   const og = {
@@ -119,6 +120,7 @@ export async function getStaticProps() {
     Prismic.Predicates.at("document.type", "blog"),
     {
       pageSize: 200,
+      orderings: "[my.blog.date desc]",
     }
   );
 

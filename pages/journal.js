@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { RichText } from "prismic-reactjs";
-import React from "react";
+import React, { useState } from "react";
 import Footer from "../components/Footer";
 import Nav from "../components/nav";
 import { Client } from "../prismic-configuration";
 import Prismic from "prismic-javascript";
 import moment from "moment";
 import Head from "next/head";
+import { GiAstronautHelmet } from "react-icons/gi";
 
 function formatDate(date) {
   const options = { year: "numeric", month: "long", day: "numeric" };
@@ -22,6 +23,8 @@ function giveTime(DateStr) {
 }
 
 const index = ({ journals, metaData }) => {
+  const [Counter, setCounter] = useState(1);
+
   metaData = metaData.results[0].data;
 
   const og = {
@@ -88,21 +91,56 @@ const index = ({ journals, metaData }) => {
           <h1 className=" text-2xl mb-10 text-left font-serif italic">
             Journal with random thoughts and ideas that float around in my head.
           </h1>
-          <div className="grid grid-cols-1 gap-y-10">
-            {journals.results.map((journal, index) => (
-              <div className=" writing-row p-0" key={journal.uid}>
-                <div className="writing-date">
-                  {giveTime(journal.data.time)}
-                </div>
+          <div className="journal-writing grid grid-cols-1 gap-y-10">
+            <a href="https://google.com/">this is google</a>
+            {journals.results
+              .slice(10 * (Counter - 1), 10 * Counter)
+              .map((journal, index) => (
+                <div className=" writing-row p-0" key={journal.uid}>
+                  <div className="writing-date">
+                    {giveTime(journal.data.time)}
+                  </div>
 
-                <div className="writing-title font-serif italic">
-                  {RichText.render(journal.data["title"])}
+                  <div className="writing-title font-serif italic">
+                    {RichText.render(journal.data["title"])}
+                  </div>
+                  <div className="">
+                    {RichText.render(journal.data["entry"])}
+                  </div>
                 </div>
-                <div className="">{RichText.render(journal.data["entry"])}</div>
+              ))}
+            {journals.results.slice(10 * (Counter - 1), 10 * Counter).length <
+              1 && (
+              <div className="flex flex-col w-full items-center">
+                {" "}
+                <GiAstronautHelmet className="text-9xl text-brand-blue" />{" "}
+                <h1 className="mt-10 text-2xl">None Found. Try going back.</h1>{" "}
               </div>
-            ))}
+            )}
+          </div>
+          <div className="w-full flex justify-between mt-10">
+            {Counter > 1 && (
+              <button
+                className="back-button"
+                onClick={() => setCounter((prev) => prev - 1)}
+              >
+                Previous
+              </button>
+            )}
+            {!(
+              journals.results.slice(10 * (Counter - 1), 10 * Counter).length <
+              10
+            ) && (
+              <button
+                className="back-button"
+                onClick={() => setCounter((prev) => prev + 1)}
+              >
+                Next
+              </button>
+            )}
           </div>
         </div>
+
         <Footer />
       </div>
     </>
@@ -115,7 +153,8 @@ export async function getStaticProps() {
   const journals = await Client().query(
     Prismic.Predicates.at("document.type", "journal"),
     {
-      pageSize: 200,
+      pageSize: 500,
+      orderings: "[my.journal.time desc]",
     }
   );
 

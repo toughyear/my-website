@@ -5,7 +5,7 @@ import { Client } from "../../prismic-configuration";
 import ProgressBar from "react-scroll-progress-bar";
 import Nav from "../../components/nav";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import allyDark from "react-syntax-highlighter/dist/cjs/styles/hljs/a11y-dark";
+import MonoKai from "react-syntax-highlighter/dist/cjs/styles/hljs/monokai";
 import Footer from "../../components/Footer";
 import Prismic from "prismic-javascript";
 
@@ -40,7 +40,7 @@ export default function Blog({ blog, tweetsData }) {
           <SyntaxHighlighter
             key={`${slice.slice_type}-${index}`}
             language={RichText.asText(slice.slice_label)}
-            style={allyDark}
+            style={MonoKai}
             className="my-10"
           >
             {RichText.asText(slice.primary["code-content"])}
@@ -48,7 +48,11 @@ export default function Blog({ blog, tweetsData }) {
         );
       } else if (slice.slice_type === "quote") {
         return (
-          <blockquote key={`${slice.slice_type}-${index}`}>
+          <blockquote
+            className="text-xl italic"
+            style={{ color: "var(--writing-body)" }}
+            key={`${slice.slice_type}-${index}`}
+          >
             {RichText.asText(slice.primary["quote"])}
           </blockquote>
         );

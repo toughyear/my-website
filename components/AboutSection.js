@@ -71,7 +71,7 @@ export default function AboutSection({ data }) {
               return (
                 <div className="flex flex-col items-center" key={`tools-${i}`}>
                   <Icon stack={keytext} />{" "}
-                  <h1 className="font-ibm-mono text-sm ">{keytext}</h1>
+                  <h1 className="font-ibm-mono text-sm mt-2">{keytext}</h1>
                 </div>
               );
             })}

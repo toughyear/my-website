@@ -516,6 +516,16 @@ footer {
   font-weight: bold;
 }
 
+.writing-container h2 {
+  display: block;
+  font-size: 1.5em;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+}
+
 h2 {
   display: block;
   font-size: 1.5em;
@@ -528,4 +538,38 @@ h2 {
 
 .nav-link {
   color: var(--primary-color);
+}
+
+.writing-container li {
+  list-style: square;
+  @apply text-xl;
+  @apply mb-4;
+  color: var(--writing-body);
+}
+
+.writing-container .code {
+  font-family: ibm-plex-mono, Monaco, "Lucida Console";
+  background: var(--highlight-color);
+  color: var(--heading-color);
+  padding: 2px 7px 5px;
+  border-radius: 4px;
+  line-height: 1em;
+  font-size: 16px;
+  display: inline-flex;
+}
+
+@media screen {
+  iframe {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 400px !important;
+  }
+}
+
+.writing-container {
+  @apply break-words;
+}
+
+.journal-writing a {
+  @apply underline;
 }
