@@ -571,5 +571,15 @@ h2 {
 }
 
 .journal-writing a {
-  @apply underline;
+  color: var(--heading-color);
+  text-decoration: none;
+  border-bottom: 1px var(--heading-color) dashed;
+  line-height: 0.5rem;
+  margin-top: 0;
+}
+
+.journal-writing img {
+  max-height: 600px;
+  @apply mx-auto;
+  @apply my-5;
 }

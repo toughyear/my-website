@@ -92,7 +92,6 @@ const index = ({ journals, metaData }) => {
             Journal with random thoughts and ideas that float around in my head.
           </h1>
           <div className="journal-writing grid grid-cols-1 gap-y-10">
-            <a href="https://google.com/">this is google</a>
             {journals.results
               .slice(10 * (Counter - 1), 10 * Counter)
               .map((journal, index) => (
